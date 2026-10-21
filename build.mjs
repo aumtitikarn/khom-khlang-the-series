@@ -4,5 +4,6 @@ const r = await build({ entryPoints: ['src/main.jsx'], bundle: true, minify: tru
 let js = r.outputFiles[0].text.replace(/<\/script/gi, '<\\/script')
 const html = fs.readFileSync('src/template.html', 'utf8').replace('/*BUNDLE*/', () => js)
 fs.mkdirSync('dist', { recursive: true })
+fs.writeFileSync('dist/index.html', html)
 fs.writeFileSync('dist/khom-diorama.html', html)
 console.log('bytes', html.length)
