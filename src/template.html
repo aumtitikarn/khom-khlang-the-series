@@ -1,0 +1,122 @@
+<title>ห้องของแม่ครู</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600&family=Noto+Serif+Thai:wght@600;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: full-bleed 3D diorama, UI floats on the corners like a model-maker's study sheet */
+:root {
+  --bg: #0b0807;
+  --panel: rgba(18, 12, 9, 0.8);
+  --line: #4b3826;
+  --fg: #f3e9d7;
+  --muted: #bcaa8d;
+  --accent: #eba43a;
+  --lacquer: #a8352a;
+  --ink: #1a0f08;
+  --display: 'Noto Serif Thai', 'Noto Serif', Georgia, serif;
+  --ui: 'Chakra Petch', 'Noto Sans Thai', system-ui, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+  color-scheme: dark;
+}
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--fg); font-family: var(--ui); overflow: hidden; }
+#root, .app { position: relative; width: 100%; height: 100%; }
+.app canvas { display: block; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.loading { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--mono); font-size: 13px; letter-spacing: .16em; color: var(--muted); pointer-events: none; }
+body.ready .loading { display: none; }
+
+.head, .card, .hint, .show { position: absolute; z-index: 30; }
+.head {
+  top: 12px; left: max(16px, env(safe-area-inset-left, 0px)); right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 8px;
+  pointer-events: none;
+}
+.head > * { pointer-events: auto; }
+.eyebrow { margin: 0; font-family: var(--mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+.head h1 { margin: 0; font-family: var(--display); font-weight: 800; font-size: clamp(30px, 5vw, 46px); line-height: 1.25; text-wrap: balance; text-shadow: 0 2px 18px rgba(0,0,0,.6); }
+.sub { margin: 0 0 8px; font-size: 15px; color: var(--muted); }
+
+.moods { display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; backdrop-filter: blur(8px); align-self: flex-start; }
+.moods button, .tools button {
+  min-height: 40px; padding: 0 14px; border: 1px solid transparent; border-radius: 7px; background: transparent;
+  display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted);
+}
+.moods button:hover, .tools button:hover { color: var(--fg); }
+.moods button.on { background: var(--accent); color: var(--ink); font-weight: 600; }
+.kbd { font-family: var(--mono); font-size: 11px; padding: 1px 5px; border: 1px solid currentColor; border-radius: 4px; opacity: .7; }
+
+.tools {
+  display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px; padding: 4px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 10px; backdrop-filter: blur(8px);
+}
+.tools button.on { border-color: var(--line); color: var(--fg); background: rgba(235, 164, 58, 0.14); }
+
+.card {
+  right: max(16px, env(safe-area-inset-right, 0px)); bottom: 56px;
+  width: min(340px, calc(100% - 32px));
+  padding: 18px 20px 20px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; backdrop-filter: blur(10px);
+  display: flex; flex-direction: column; gap: 4px;
+}
+.card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.num { font-family: var(--mono); font-size: 12px; letter-spacing: .1em; color: var(--accent); font-variant-numeric: tabular-nums; }
+.nav { display: flex; gap: 6px; }
+.nav button { width: 36px; height: 36px; border: 1px solid var(--line); border-radius: 50%; background: transparent; font-size: 18px; line-height: 1; }
+.nav button:hover { border-color: var(--accent); color: var(--accent); }
+.card h2 { margin: 0; font-family: var(--display); font-size: 28px; line-height: 1.3; }
+.en { margin: 0; font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.body { margin: 10px 0 0; font-size: 15px; line-height: 1.7; }
+.said { margin: 12px 0 0; padding-left: 14px; border-left: 2px solid var(--accent); display: flex; flex-direction: column; gap: 6px; }
+.said blockquote { margin: 0; font-family: var(--display); font-weight: 600; font-size: 18px; line-height: 1.65; text-wrap: pretty; }
+.said figcaption { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.cast { margin: 10px 0 0; padding-top: 10px; border-top: 1px solid var(--line); font-size: 14px; display: flex; flex-direction: column; }
+.cast span { font-size: 12px; color: var(--muted); }
+
+.hint {
+  left: max(16px, env(safe-area-inset-left, 0px)); bottom: 16px; right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-wrap: wrap; gap: 6px 18px; font-family: var(--mono); font-size: 12px; color: var(--muted);
+  pointer-events: none; text-shadow: 0 1px 6px rgba(0,0,0,.8);
+}
+.hint .fan { margin-left: auto; color: var(--accent); }
+
+.show { right: max(16px, env(safe-area-inset-right, 0px)); bottom: 16px; min-height: 40px; padding: 0 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); }
+
+.pin {
+  width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid var(--accent);
+  background: rgba(14, 9, 6, 0.85); color: var(--accent);
+  font-family: var(--mono); font-size: 13px; font-weight: 500; display: grid; place-items: center;
+  box-shadow: 0 0 0 4px rgba(235, 164, 58, 0.15);
+  transition: transform .15s ease;
+}
+.pin:hover { transform: scale(1.12); }
+.pin.on { background: var(--accent); color: var(--ink); }
+
+.line {
+  position: absolute; z-index: 30; margin: 0;
+  left: max(16px, env(safe-area-inset-left, 0px)); bottom: 48px;
+  width: min(560px, calc(100% - 420px));
+  padding: 16px 20px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; backdrop-filter: blur(10px);
+  display: flex; flex-direction: column; gap: 6px;
+}
+.line figcaption { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; color: var(--muted); }
+.line figcaption span { color: var(--accent); }
+.line blockquote { margin: 0; font-family: var(--display); font-weight: 600; font-size: clamp(17px, 1.7vw, 22px); line-height: 1.6; text-wrap: balance; }
+@media (max-width: 900px) {
+  .line { top: 236px; bottom: auto; right: max(16px, env(safe-area-inset-right, 0px)); width: auto; padding: 12px 14px; }
+  .line blockquote { font-size: 16px; }
+}
+@media (max-width: 640px) {
+  .head h1 { font-size: 28px; }
+  .sub { font-size: 13px; }
+  .line { top: 136px; }
+  .moods button, .tools button { min-height: 36px; padding: 0 10px; font-size: 13px; }
+  .card { left: max(16px, env(safe-area-inset-left, 0px)); right: max(16px, env(safe-area-inset-right, 0px)); width: auto; bottom: 16px; padding: 14px 16px 16px; }
+  .card h2 { font-size: 22px; }
+  .body { font-size: 14px; }
+  .hint { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .pin { transition: none; } }
+</style>
+<div id="root"><div class="loading">กำลังประกอบโมเดล…</div></div>
+<script>/*BUNDLE*/</script>
