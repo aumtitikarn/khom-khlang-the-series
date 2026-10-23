@@ -130,6 +130,13 @@ body.ready .loading { display: none; }
 .yt:hover { filter: brightness(1.15); color: #fff; }
 .player.missing { opacity: .65; }
 .player.missing .pp { cursor: not-allowed; }
+.visitors {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 12px 0 10px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 999px; backdrop-filter: blur(8px);
+  font-family: var(--mono); font-size: 13px; letter-spacing: .04em; color: var(--fg); font-variant-numeric: tabular-nums;
+}
+.visitors svg { color: var(--accent); flex: none; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 @media (max-width: 640px) {
   .head h1 { font-size: 28px; }
   .sub { font-size: 13px; }

@@ -1748,6 +1748,35 @@ const SPOTS5 = [
   { th: 'หมวดภีม', en: 'Police Lt. Pheem', pos: [0.55, 1.85, 1.45], look: [0.45, 1.1, 1.45], cam: [0.75, 1.3, 0.0], cast: 'ปุยนุ่น วรางค์ศิริ ธนจรัสวรภัทร์', quote: 'ฉันขอพรจากท่านว่า ขอให้ฉัน และก็แม่ครูบุหลัน ได้อยู่เคียงข้างกันแบบนี้ตลอดไป ไม่ว่าจะอันตรายอะไรก็ตาม ขออย่าทำให้เราสองคนได้พรากออกจากกัน ไหนๆ เราสองคนก็ได้ถูกลิขิตให้เป็น คู่บุญ กันแล้ว ฉันรักแม่ครูบุหลัน...รักมากกว่าใคร', to: 'แม่ครูบุหลัน' },
 ]
 
+/* ---------- visitor counter (shared count via the free Abacus API, no key needed) ---------- */
+const COUNTER_API = 'https://abacus.jasoncameron.dev/'
+const COUNTER_NS = 'khomkhlang-diorama-aumzaap'
+function Visitors() {
+  const [n, setN] = useState(() => { try { return +localStorage.getItem('visitors') || null } catch { return null } })
+  useEffect(() => {
+    let seen = false
+    try { seen = sessionStorage.getItem('visit-counted') === '1' } catch {}
+    const ctrl = new AbortController()
+    // first page view in this tab counts once ("hit"); reloads only read the number ("get")
+    fetch(COUNTER_API + (seen ? 'get' : 'hit') + '/' + COUNTER_NS + '/visits', { signal: ctrl.signal })
+      .then(r => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then(d => {
+        if (typeof d.value !== 'number') return
+        setN(d.value)
+        try { sessionStorage.setItem('visit-counted', '1'); localStorage.setItem('visitors', String(d.value)) } catch {}
+      })
+      .catch(() => {})
+    return () => ctrl.abort()
+  }, [])
+  if (n == null) return null
+  return (
+    <span className="visitors" title="ผู้เข้าชมทั้งหมด">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="7.5" r="4"></circle><path d="M4 20.5c0-4.1 3.6-7 8-7s8 2.9 8 7v.5H4z"></path></svg>
+      <span className="sr">ผู้เข้าชม </span><span>{n.toLocaleString('en-US')}</span><span className="sr"> คน</span>
+    </span>
+  )
+}
+
 /* ---------- camera fly-to ---------- */
 const OVERVIEW = { cam: [0.4, 3.4, 10.6], look: [0.4, 1.8, -1.0] }
 function Focus({ shot }) {
@@ -1964,6 +1993,7 @@ function App() {
                 <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 2.5 L13 8 L4.5 13.5 Z" fill="currentColor"></path></svg>
               </a>
             </div>
+            <Visitors />
             </div>
           </header>
 
