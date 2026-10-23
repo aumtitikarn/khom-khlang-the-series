@@ -1439,7 +1439,17 @@ function Scalloped({ position, w, h, rotY = 0 }) {
       sh.quadraticCurveTo((x0 + x1) / 2, h + 0.12 * (i % 2 ? -1 : 1), x1, h)
     }
     sh.lineTo(w / 2, 0); sh.closePath()
-    return new THREE.ExtrudeGeometry(sh, { depth: 0.06, bevelEnabled: true, bevelSize: 0.015, bevelThickness: 0.015, bevelSegments: 2 })
+    const g = new THREE.ExtrudeGeometry(sh, { depth: 0.06, bevelEnabled: true, bevelSize: 0.015, bevelThickness: 0.015, bevelSegments: 2 })
+    // The scalloped outline yields a few zero-area triangles whose vertex normals are (0,0,0).
+    // normalize() of a zero vector in the shader gives NaN, and the bloom pass then smears that
+    // NaN over the whole frame (random black frames in scene 4). Replace them with any unit vector.
+    const nr = g.attributes.normal
+    for (let i = 0; i < nr.count; i++) {
+      const x = nr.getX(i), y = nr.getY(i), z = nr.getZ(i)
+      if (!(x * x + y * y + z * z > 1e-8)) nr.setXYZ(i, 0, 0, 1)
+    }
+    nr.needsUpdate = true
+    return g
   }, [w, h])
   return <mesh geometry={geo} position={position} rotation-y={rotY} castShadow receiveShadow><meshStandardMaterial color="#6b3a1e" roughness={0.45} /></mesh>
 }
