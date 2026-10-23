@@ -1850,6 +1850,17 @@ function App() {
   const [active, setActive] = useState(1)
   const [shot, setShot] = useState(null)
   useEffect(() => { if (!reduce) setShot({ ...OVERVIEW }) }, [])
+  const audioRef = useRef(null)
+  const [playing, setPlaying] = useState(false)
+  const [dur, setDur] = useState(0)
+  const [pos, setPos] = useState(0)
+  const [noSong, setNoSong] = useState(false)
+  const togglePlay = () => {
+    const a = audioRef.current
+    if (!a || noSong) return
+    if (playing) a.pause()
+    else a.play().catch(() => setNoSong(true))
+  }
   const sc = SCENES[sceneId]
   const spots = sc.spots
   const ref = useRef({ spots, active })
@@ -1887,6 +1898,10 @@ function App() {
         onCreated={({ gl }) => { gl.toneMapping = THREE.ACESFilmicToneMapping; gl.toneMappingExposure = 1.05; document.body.classList.add('ready') }}>
         <Scene sceneId={sceneId} spots={spots} mood={mood} petals={petals && sceneId === 1} pinsOn={pinsOn && ui} active={active} pick={pick} turntable={turntable} shot={shot} />
       </Canvas>
+      <audio ref={audioRef} src="./cage-ost.mp3" loop preload="metadata"
+        onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)}
+        onTimeUpdate={e => setPos(e.target.currentTime)} onLoadedMetadata={e => setDur(e.target.duration)}
+        onError={() => setNoSong(true)} />
 
       {ui && (
         <>
@@ -1898,12 +1913,28 @@ function App() {
                 </button>
               ))}
             </div>
+            <div className="side">
             <div className="tools" role="group" aria-label="ตัวเลือกการแสดงผล">
             <button type="button" aria-pressed={pinsOn} className={pinsOn ? 'on' : ''} onClick={() => setPinsOn(v => !v)}>หมุด</button>
             {sceneId === 1 && <button type="button" aria-pressed={petals} className={petals ? 'on' : ''} onClick={() => setPetals(v => !v)}>ดาวเรืองร่วง</button>}
             <button type="button" aria-pressed={turntable} className={turntable ? 'on' : ''} onClick={() => setTurntable(v => !v)}>หมุนรอบ</button>
             <button type="button" onClick={overview}>มุมกว้าง</button>
               <button type="button" onClick={() => setUi(false)}>ซ่อน UI</button>
+            </div>
+            <div className={'player' + (playing ? ' playing' : '') + (noSong ? ' missing' : '')}>
+              <div className="disc" aria-hidden="true"></div>
+              <div className="meta">
+                <span className="song">ขังหัวใจ (Cage)</span>
+                <span className="artist">{noSong ? 'ไม่พบไฟล์ cage-ost.mp3' : 'Zom Marie · Ost. ข่มขลัง'}</span>
+                <input className="seek" type="range" min="0" max={dur || 0} step="0.1" value={Math.min(pos, dur || 0)} aria-label="ตำแหน่งเพลง"
+                  onChange={e => { const a = audioRef.current; if (a && dur) { a.currentTime = +e.target.value; setPos(+e.target.value) } }} />
+              </div>
+              <button type="button" className="pp" aria-label={playing ? 'หยุดเพลง' : 'เล่นเพลง'} onClick={togglePlay}>
+                {playing
+                  ? <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><rect x="2" y="1" width="3.4" height="12" rx="1" fill="currentColor"></rect><rect x="8.6" y="1" width="3.4" height="12" rx="1" fill="currentColor"></rect></svg>
+                  : <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 1.5 L12.5 7 L3 12.5 Z" fill="currentColor"></path></svg>}
+              </button>
+            </div>
             </div>
           </header>
 
