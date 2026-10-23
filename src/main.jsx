@@ -1847,7 +1847,7 @@ function App() {
   const [pinsOn, setPinsOn] = useState(true)
   const [turntable, setTurntable] = useState(false)
   const [ui, setUi] = useState(true)
-  const [active, setActive] = useState(1)
+  const [active, setActive] = useState(0)
   const [shot, setShot] = useState(null)
   useEffect(() => { if (!reduce) setShot({ ...OVERVIEW }) }, [])
   const audioRef = useRef(null)
@@ -1887,10 +1887,7 @@ function App() {
   const overview = () => setShot({ ...SCENES[sceneId].over })
   const go = id => {
     if (id === sceneId) return
-    const sc2 = SCENES[id]
-    const narrow = typeof window !== 'undefined' && window.innerWidth < 700
-    setSceneId(id); setActive(sc2.first)
-    setShot(narrow && id === 3 ? { ...sc2.spots[sc2.first] } : { ...sc2.over })
+    setSceneId(id); setActive(0); setShot({ ...SCENES[id].spots[0] })
   }
 
   useEffect(() => {
