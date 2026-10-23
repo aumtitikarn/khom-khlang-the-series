@@ -1992,7 +1992,7 @@ function App() {
 
           <footer className="hint">
             <span>ลากเพื่อหมุน</span><span>เลื่อนเพื่อซูม</span><span>กดหมุดเพื่อซูมดูใกล้</span><span>H ซ่อน UI</span>
-            <span className="fan">แฟนเมด ไม่ใช่ของทางการ</span>
+            <span className="fan">Create By : Aumzaap [No official]</span>
           </footer>
         </>
       )}
