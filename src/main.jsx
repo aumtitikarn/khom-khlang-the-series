@@ -1855,6 +1855,24 @@ function App() {
   const [dur, setDur] = useState(0)
   const [pos, setPos] = useState(0)
   const [noSong, setNoSong] = useState(false)
+  const autoStarted = useRef(false)
+  useEffect(() => {
+    const a = audioRef.current
+    if (!a) return
+    const start = () => {
+      if (autoStarted.current || a.error) { cleanup(); return }
+      a.play().then(() => { autoStarted.current = true; cleanup() }).catch(() => {})
+    }
+    const cleanup = () => {
+      window.removeEventListener('pointerdown', start, true)
+      window.removeEventListener('keydown', start, true)
+    }
+    a.play().then(() => { autoStarted.current = true }).catch(() => {
+      window.addEventListener('pointerdown', start, true)
+      window.addEventListener('keydown', start, true)
+    })
+    return cleanup
+  }, [])
   const togglePlay = () => {
     const a = audioRef.current
     if (!a || noSong) return
