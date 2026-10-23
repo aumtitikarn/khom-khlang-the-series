@@ -1882,12 +1882,20 @@ function App() {
   const sc = SCENES[sceneId]
   const spots = sc.spots
   const ref = useRef({ spots, active })
-  ref.current = { spots, active }
+  ref.current = { spots, active, sceneId }
   const pick = i => { setActive(i); setShot({ ...ref.current.spots[i] }) }
   const overview = () => setShot({ ...SCENES[sceneId].over })
-  const go = id => {
-    if (id === sceneId) return
-    setSceneId(id); setActive(0); setShot({ ...SCENES[id].spots[0] })
+  const ORDER = [1, 2, 3, 4, 5]
+  const jump = (id, idx) => { setSceneId(id); setActive(idx); setShot({ ...SCENES[id].spots[idx] }) }
+  const nextStep = () => {
+    const { spots: sp, active: ac, sceneId: sid } = ref.current
+    if (ac < sp.length - 1) pick(ac + 1)
+    else { const nid = ORDER[(ORDER.indexOf(sid) + 1) % ORDER.length]; jump(nid, 0) }
+  }
+  const prevStep = () => {
+    const { active: ac, sceneId: sid } = ref.current
+    if (ac > 0) pick(ac - 1)
+    else { const nid = ORDER[(ORDER.indexOf(sid) + ORDER.length - 1) % ORDER.length]; jump(nid, SCENES[nid].spots.length - 1) }
   }
 
   useEffect(() => {
@@ -1899,8 +1907,8 @@ function App() {
       else if (key === 'p') setPinsOn(v => !v)
       else if (key === 'f') setPetals(v => !v)
       else if (key === 't') setTurntable(v => !v)
-      else if (key === 'arrowright') pick((ac + 1) % sp.length)
-      else if (key === 'arrowleft') pick((ac + sp.length - 1) % sp.length)
+      else if (key === 'arrowright') nextStep()
+      else if (key === 'arrowleft') prevStep()
     }
     window.addEventListener('keydown', k)
     return () => window.removeEventListener('keydown', k)
@@ -1921,13 +1929,6 @@ function App() {
       {ui && (
         <>
           <header className="head">
-            <div className="moods" role="tablist" aria-label="เลือกฉาก">
-              {[1, 2, 3, 4, 5].map(id => (
-                <button type="button" role="tab" key={id} className={sceneId === id ? 'on' : ''} aria-selected={sceneId === id} onClick={() => go(id)}>
-                  <span className="kbd">{id}</span>{SCENES[id].tab}
-                </button>
-              ))}
-            </div>
             <div className="side">
             <div className="tools" role="group" aria-label="ตัวเลือกการแสดงผล">
             <button type="button" aria-pressed={pinsOn} className={pinsOn ? 'on' : ''} onClick={() => setPinsOn(v => !v)}>หมุด</button>
@@ -1965,10 +1966,10 @@ function App() {
 
           <aside className="card" aria-live="polite">
             <div className="card-top">
-              <span className="num">{String(active + 1).padStart(2, '0')} / {String(spots.length).padStart(2, '0')}</span>
+              <span className="num">ฉาก {sceneId} · {SCENES[sceneId].tab} · {String(active + 1).padStart(2, '0')}/{String(spots.length).padStart(2, '0')}</span>
               <div className="nav">
-                <button type="button" aria-label="ก่อนหน้า" onClick={() => pick((active + spots.length - 1) % spots.length)}>‹</button>
-                <button type="button" aria-label="ถัดไป" onClick={() => pick((active + 1) % spots.length)}>›</button>
+                <button type="button" aria-label="ก่อนหน้า" onClick={prevStep}>‹</button>
+                <button type="button" aria-label="ถัดไป" onClick={nextStep}>›</button>
               </div>
             </div>
             <h2>{s.th}</h2>
