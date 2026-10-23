@@ -1925,7 +1925,7 @@ function App() {
               <div className="disc" aria-hidden="true"></div>
               <div className="meta">
                 <span className="song">ขังหัวใจ (Cage)</span>
-                <span className="artist">{noSong ? 'ไม่พบไฟล์ cage-ost.mp3' : 'Zom Marie · Ost. ข่มขลัง'}</span>
+                <span className="artist">{noSong ? 'ฟังเพลงเต็มได้ที่ปุ่มแดง' : 'Zom Marie · Ost. ข่มขลัง'}</span>
                 <input className="seek" type="range" min="0" max={dur || 0} step="0.1" value={Math.min(pos, dur || 0)} aria-label="ตำแหน่งเพลง"
                   onChange={e => { const a = audioRef.current; if (a && dur) { a.currentTime = +e.target.value; setPos(+e.target.value) } }} />
               </div>
@@ -1934,6 +1934,9 @@ function App() {
                   ? <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><rect x="2" y="1" width="3.4" height="12" rx="1" fill="currentColor"></rect><rect x="8.6" y="1" width="3.4" height="12" rx="1" fill="currentColor"></rect></svg>
                   : <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 1.5 L12.5 7 L3 12.5 Z" fill="currentColor"></path></svg>}
               </button>
+              <a className="yt" href="https://www.youtube.com/watch?v=igWedlWk_8g" target="_blank" rel="noopener" aria-label="ฟังเพลงขังหัวใจบน YouTube">
+                <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 2.5 L13 8 L4.5 13.5 Z" fill="currentColor"></path></svg>
+              </a>
             </div>
             </div>
           </header>
